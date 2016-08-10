@@ -49,7 +49,62 @@ cd etcd && vim etcd.conf
 edit
 ```
 export ETCD_NAME=ke
-export ETCD_DATA_DIR="/var/lib/etcd/ke.etcd"
+export ETCD_DATA_DIR="/tmp/ke.etcd"
 export ETCD_LISTEN_CLIENT_URLS="http://0.0.0.0/8080"
 export ETCD_ADVERTISE_CLIENT_URLS="http://localhost:8080"
+```
+
+#####install flannel on u16
+```
+apt-get install linux-libc-dev golang gcc -y
+```
+
+```
+vim ke.json
+```
+edit
+```
+{
+"Network":"10.136.0.0/16",
+"SubnetLen":28
+"SubnetMin":"10.136.16.0",
+"SubnetMax":"10.136.99.0",
+"Backend":{
+        "Type":"udp",
+        "Port":7890
+}
+}
+```
+then create service file in system
+```
+vim /lib/systemd/system/flanneld.service
+```
+edit
+```
+[Unit]
+Description=Flannel
+Wants=etcd.service
+After=etcd.service
+Before=docker.service
+
+[Service]
+Type=Notify
+
+EnvironmentFile=/etc/sysconfig/flanneld
+EnvironmentFile=-/etc/sysconfig/docker-network
+ExecStart=/usr/bin/flanneld -etcd-endpoints=${FLANNEL_ETCD} -etcd-prefix=${FLANN
+EL_ETCD_KEY} $FLANNEL_OPTIONS
+Restart=on-failure
+
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+```
+then create flanneld:
+```
+cd /etc && mkdir sysconfig && cd sysconfig && vim flanneld
+```
+FLANNEL_ETCD="http://localhost:2379"
+FLANNEL_ETCD_KEY="/coreos.com/network"
 ```
