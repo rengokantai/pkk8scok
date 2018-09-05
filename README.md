@@ -1,5 +1,15 @@
-#### pkk8scok
-#####Chapter1: Building Your Own Kubernetes
+# pkk8scok
+## Chapter1: Building Your Own Kubernetes
+
+```
+kube-apiserver, kube-scheduler and kube-controller-manager
+```
+
+### Command-line interface
+```
+kubectl get cs
+```
+
 install etcd  
 u15
 ```
